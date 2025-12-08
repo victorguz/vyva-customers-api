@@ -1,0 +1,21 @@
+import * as moment from 'moment-timezone';
+export declare function datePlusDays(date: Date | moment.Moment, days: number): moment.Moment;
+export declare function encrypt(data: any): any;
+export declare function decrypt(data: any): any;
+export declare function cloneObject(obj: any): any;
+export declare function deleteEmptyProperties(obj: any): any;
+export declare function dataComparison(actual: number, previous: number): number;
+export declare function getOrderedMonthsFromCurrent(): Array<{
+    year: number;
+    month: string;
+}>;
+export declare function plainObject(rawObject: any): any;
+export declare function today(): moment.Moment;
+export declare function todayAt00(): moment.Moment;
+export declare function yesterdayAt00(): moment.Moment;
+export declare function firstDayOfMonthAt00(): moment.Moment;
+export declare function lastMonthAt00(): moment.Moment;
+export declare function dateDiffHours(date: Date, other: Date): number;
+export declare function formatDate(date?: moment.MomentInput): moment.Moment;
+export declare function formatDateToDB(date?: moment.MomentInput): string;
+export declare function toTitleCase(cad: string, split?: string): string;
