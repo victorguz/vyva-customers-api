@@ -1,4 +1,4 @@
-service: vyva-customers-api
+service: vyva-customers
 frameworkVersion: "3"
 
 provider:
