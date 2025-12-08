@@ -84,15 +84,15 @@ functions:
 
 package:
   patterns:
-    - '!node_modules/**'
+    - '!node_modules/aws-sdk/**'
+    - '!node_modules/@types/**'
     - '!src/**'
     - '!*.md'
-    - '!*.json'
     - '!*.ts'
     - '!*.tsbuildinfo'
+    - '!test/**'
+    - '!.git/**'
     - 'dist/**'
+    - 'node_modules/**'
     - 'package.json'
-    - 'package-lock.json'
-
-
 
