@@ -1,32 +1,36 @@
-import { Injectable } from '@nestjs/common';
-import * as moment from 'moment';
-import { InjectModel, Model } from 'nestjs-dynamoose';
-import { User } from 'src/app/schemas/user.schema';
-import { deleteEmptyProperties } from 'src/app/shared/shared.functions';
-import { v4 as uuidv4 } from 'uuid';
+import { Injectable } from "@nestjs/common";
+import * as moment from "moment";
+import { InjectModel, Model } from "nestjs-dynamoose";
+import { User } from "src/app/schemas/user.schema";
+import { deleteEmptyProperties } from "src/app/shared/shared.functions";
+import { v4 as uuidv4 } from "uuid";
 
-import { GenericResponse } from '../../core/interfaces/generic-response.interface';
-import { Customer, CustomerKey } from '../../schemas/customer.schema';
-import { handleError } from '../../shared/error.functions';
-import { CreateCustomerDto, CustomersCountResponseDto, UpdateCustomerDto } from './dto/customers.dto';
+import { GenericResponse } from "../../core/interfaces/generic-response.interface";
+import { Customer, CustomerKey } from "../../schemas/customer.schema";
+import { handleError } from "../../shared/error.functions";
+import {
+  CreateCustomerDto,
+  CustomersCountResponseDto,
+  UpdateCustomerDto,
+} from "./dto/customers.dto";
 
 @Injectable()
 export class CustomersService {
   constructor(
-    @InjectModel('Customer')
-    private readonly model: Model<Customer, CustomerKey>,
+    @InjectModel("Customer")
+    private readonly model: Model<Customer, CustomerKey>
   ) {}
 
   async findAll(user: User): Promise<GenericResponse<Customer[]>> {
     try {
       const customers = await this.model
         .scan()
-        .where('businessId')
-        .eq(user.businessInfoId)
+        .where("businessId")
+        .eq(user.idBusiness)
         .exec();
 
       return new GenericResponse(
-        customers.map((customer) => customer.serialize('frontend') as Customer),
+        customers.map((customer) => customer.serialize("frontend") as Customer)
       );
     } catch (error) {
       throw handleError(error);
@@ -37,13 +41,13 @@ export class CustomersService {
     try {
       const customer = await this.model.get({ id });
       if (!customer) {
-        throw new Error('MS007');
+        throw new Error("MS007");
       }
 
       // Verify customer belongs to the business
       const customerData = customer.toJSON() as Customer;
-      if (customerData.businessId !== user.businessInfoId) {
-        throw new Error('MS007'); // Not found (for security)
+      if (customerData.businessId !== user.idBusiness) {
+        throw new Error("MS007"); // Not found (for security)
       }
 
       return new GenericResponse(customerData);
@@ -54,19 +58,19 @@ export class CustomersService {
 
   async findOneByEmail(
     email: string,
-    user: User,
+    user: User
   ): Promise<GenericResponse<Customer>> {
     try {
       const customers = await this.model
         .scan()
-        .where('email')
+        .where("email")
         .eq(email.toLowerCase())
-        .where('businessId')
-        .eq(user.businessInfoId)
+        .where("businessId")
+        .eq(user.idBusiness)
         .exec();
 
       if (!customers || customers.length === 0) {
-        throw new Error('MS007');
+        throw new Error("MS007");
       }
 
       const customerData = customers[0].toJSON() as Customer;
@@ -78,19 +82,19 @@ export class CustomersService {
 
   async findByUserId(
     userId: string,
-    user: User,
+    user: User
   ): Promise<GenericResponse<Customer[]>> {
     try {
       const customers = await this.model
         .scan()
-        .where('userId')
+        .where("userId")
         .eq(userId)
-        .where('businessId')
-        .eq(user.businessInfoId)
+        .where("businessId")
+        .eq(user.idBusiness)
         .exec();
 
       return new GenericResponse(
-        customers.map((customer) => customer.toJSON() as Customer),
+        customers.map((customer) => customer.toJSON() as Customer)
       );
     } catch (error) {
       throw handleError(error);
@@ -99,7 +103,7 @@ export class CustomersService {
 
   async create(
     body: CreateCustomerDto,
-    user: User,
+    user: User
   ): Promise<GenericResponse<Customer>> {
     try {
       // Verificar email duplicado solo si se proporciona email (dentro del mismo business)
@@ -109,12 +113,12 @@ export class CustomersService {
         firstName: body.firstName,
         lastName: body.lastName,
         email: body.email ? body.email.toLowerCase() : undefined,
-        role: body.role || 'customer',
+        role: body.role || "customer",
         status: body.status !== undefined ? body.status : true,
         documentType: body.documentType,
         documentNumber: body.documentNumber,
         phone: body.phone,
-        typePerson: body.typePerson || 'natural',
+        typePerson: body.typePerson || "natural",
         gender: body.gender,
         dateOfBirth: body.dateOfBirth,
         country: body.country,
@@ -122,7 +126,7 @@ export class CustomersService {
         address: body.address,
         profilePicture: body.profilePicture,
         userId: body.userId,
-        businessId: user.businessInfoId, // Set businessId from current user
+        businessId: user.idBusiness, // Set businessId from current user
         data: body.data,
         createdAt: moment().toISOString(),
         updatedAt: moment().toISOString(),
@@ -140,22 +144,22 @@ export class CustomersService {
   async update(
     id: string,
     updateCustomerDto: UpdateCustomerDto,
-    user: User,
+    user: User
   ): Promise<GenericResponse<Customer>> {
     try {
       // First verify customer belongs to this business
       const existingCustomer = await this.model.get({ id });
       if (!existingCustomer) {
-        throw new Error('MS007');
+        throw new Error("MS007");
       }
 
       const existingCustomerData = existingCustomer.toJSON() as Customer;
-      if (existingCustomerData.businessId !== user.businessInfoId) {
-        throw new Error('MS007'); // Not found (for security)
+      if (existingCustomerData.businessId !== user.idBusiness) {
+        throw new Error("MS007"); // Not found (for security)
       }
 
       // Update email to lowercase if provided and not empty
-      if (updateCustomerDto.email && updateCustomerDto.email.trim() !== '') {
+      if (updateCustomerDto.email && updateCustomerDto.email.trim() !== "") {
         updateCustomerDto.email = updateCustomerDto.email.toLowerCase();
       }
 
@@ -167,7 +171,7 @@ export class CustomersService {
 
       // Remove empty strings for indexed fields (email has a global secondary index)
       if (
-        cleanedUpdateData.email === '' ||
+        cleanedUpdateData.email === "" ||
         cleanedUpdateData.email === null ||
         cleanedUpdateData.email === undefined
       ) {
@@ -180,7 +184,7 @@ export class CustomersService {
       await this.model.update({ id }, finalUpdateData);
       const updatedCustomer = await this.model.get({ id });
       if (!updatedCustomer) {
-        throw new Error('MS007');
+        throw new Error("MS007");
       }
       const customerData = updatedCustomer.toJSON() as Customer;
       return new GenericResponse(customerData);
@@ -193,13 +197,13 @@ export class CustomersService {
     try {
       const customer = await this.model.get({ id });
       if (!customer) {
-        throw new Error('MS007');
+        throw new Error("MS007");
       }
 
       // Verify customer belongs to this business
       const customerData = customer.toJSON() as Customer;
-      if (customerData.businessId !== user.businessInfoId) {
-        throw new Error('MS007'); // Not found (for security)
+      if (customerData.businessId !== user.idBusiness) {
+        throw new Error("MS007"); // Not found (for security)
       }
 
       await this.model.update({ id }, { status: false });
@@ -210,27 +214,27 @@ export class CustomersService {
   }
 
   async getCustomersCount(
-    user: User,
+    user: User
   ): Promise<GenericResponse<CustomersCountResponseDto>> {
     try {
       // Obtener todos los clientes del negocio
       const allCustomers = await this.model
         .scan()
-        .attributes(['businessId', 'createdAt'])
-        .where('businessId')
-        .eq(user.businessInfoId)
+        .attributes(["businessId", "createdAt"])
+        .where("businessId")
+        .eq(user.idBusiness)
         .exec();
 
       // Calcular fechas para el filtro de hoy
-      const today = moment().startOf('day');
-      const endOfDay = moment().endOf('day');
+      const today = moment().startOf("day");
+      const endOfDay = moment().endOf("day");
 
       // Filtrar clientes registrados hoy - usar consulta directa si las fechas son strings
       const todayISO = today.toISOString();
 
       const customersRegisteredToday = allCustomers.filter((customer) => {
         const customerDate = moment(customer.createdAt);
-        return customerDate.isBetween(today, endOfDay, null, '[]');
+        return customerDate.isBetween(today, endOfDay, null, "[]");
       });
 
       const response: CustomersCountResponseDto = {

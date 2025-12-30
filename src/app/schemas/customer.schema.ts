@@ -1,4 +1,4 @@
-import { Schema } from 'dynamoose';
+import { Schema } from "dynamoose";
 
 export interface CustomerKey {
   id: string;
@@ -46,14 +46,14 @@ export const CustomerSchema = new Schema(
       type: String,
       required: false,
       index: {
-        type: 'global',
-        name: 'customer-email-index',
+        type: "global",
+        name: "customer-email-index",
       },
     },
     role: {
       type: String,
       required: false,
-      default: 'customer',
+      default: "customer",
     },
     status: {
       type: Boolean,
@@ -63,12 +63,12 @@ export const CustomerSchema = new Schema(
     documentType: {
       type: String,
       required: false,
-      default: '',
+      default: "",
     },
     documentNumber: {
       type: String,
       required: false,
-      default: '',
+      default: "",
     },
     phone: {
       type: String,
@@ -77,7 +77,7 @@ export const CustomerSchema = new Schema(
     typePerson: {
       type: String,
       required: false,
-      default: 'natural',
+      default: "natural",
     },
     gender: {
       type: String,
@@ -111,8 +111,8 @@ export const CustomerSchema = new Schema(
       type: String,
       required: true,
       index: {
-        type: 'global',
-        name: 'customer-businessid-index',
+        type: "global",
+        name: "customer-businessid-index",
       },
     },
     data: {
@@ -122,5 +122,5 @@ export const CustomerSchema = new Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );

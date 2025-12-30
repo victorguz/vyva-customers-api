@@ -27,6 +27,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
         schema: UserSchema,
         options: {
           tableName: 'users',
+          throughput: 'ON_DEMAND',
         },
       },
       {
@@ -34,6 +35,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
         schema: CustomerSchema,
         options: {
           tableName: 'customers',
+          throughput: 'ON_DEMAND',
         },
         serializers: {
           frontend: {
