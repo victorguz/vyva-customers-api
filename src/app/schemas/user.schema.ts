@@ -126,7 +126,7 @@ export const UserSchema = new Schema(
       required: false,
       index: {
         type: "global",
-        name: "idBusiness-index",
+        name: "businessInfo-index",
       },
     },
     data: {
