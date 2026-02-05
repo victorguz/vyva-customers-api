@@ -7,6 +7,7 @@ import { JWT_EXPIRATION } from '../../core/config/environment.config';
 import { UserSchema } from '../../schemas/user.schema';
 import { CustomerSchema } from '../../schemas/customer.schema';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { ApiKeyGuard } from '../auth/guards/apikey.guard';
 
 @Module({
   imports: [
@@ -45,7 +46,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
       },
     ]),
   ],
-  providers: [AuthGuard],
-  exports: [AuthGuard, JwtModule, DynamooseModule],
+  providers: [AuthGuard, ApiKeyGuard],
+  exports: [AuthGuard, ApiKeyGuard, JwtModule, DynamooseModule],
 })
 export class SharedAuthModule {}

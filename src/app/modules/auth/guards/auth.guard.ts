@@ -17,6 +17,18 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+    
+    // Si ya hay un usuario autenticado (por ejemplo, por ApiKeyGuard), permitir pasar
+    if (request['user']) {
+      return true;
+    }
+    
+    // Si hay un API key en el header, permitir que el ApiKeyGuard se encargue de la autenticación
+    const apiKey = this.extractApiKeyFromHeader(request);
+    if (apiKey) {
+      return true;
+    }
+    
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       throw handleError('MS019');
@@ -41,5 +53,14 @@ export class AuthGuard implements CanActivate {
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
+  }
+
+  private extractApiKeyFromHeader(request: Request): string | undefined {
+    // Buscar en diferentes headers comunes para API keys
+    return (
+      request.headers['x-api-key'] as string | undefined ||
+      request.headers['api-key'] as string | undefined ||
+      request.headers['x-apikey'] as string | undefined
+    );
   }
 }

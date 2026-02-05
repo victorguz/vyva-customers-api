@@ -106,6 +106,14 @@ export class CustomersService {
     user: User
   ): Promise<GenericResponse<Customer>> {
     try {
+      // Validar que el usuario exista y tenga idBusiness
+      if (!user) {
+        throw new Error('MS003');
+      }
+      if (!user.idBusiness) {
+        throw new Error('MS003');
+      }
+
       // Verificar email duplicado solo si se proporciona email (dentro del mismo business)
 
       const customerObj = deleteEmptyProperties({
