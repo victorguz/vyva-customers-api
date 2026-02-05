@@ -10,14 +10,14 @@ export class ApiKeyGuard implements CanActivate {
   constructor(
     @InjectModel('User')
     private readonly model: Model<User, UserKey>,
-  ) {}
+  ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const apiKey = this.extractApiKeyFromHeader(request);
 
     if (!apiKey) {
-      throw handleError(new Error('MS003'));
+      throw new Error('MS014');
     }
 
     try {
@@ -31,7 +31,7 @@ export class ApiKeyGuard implements CanActivate {
         .exec();
 
       if (!users || users.length === 0) {
-        throw handleError(new Error('MS003'));
+        throw new Error('MS007');
       }
 
       // Obtener el usuario usando toJSON para asegurar que todas las propiedades estén incluidas
@@ -39,12 +39,12 @@ export class ApiKeyGuard implements CanActivate {
 
       // Verificar que el usuario sea admin
       if (userData.role !== UserRole.admin) {
-        throw handleError(new Error('MS003'));
+        throw new Error('MS019');
       }
 
       // Verificar que el usuario tenga idBusiness
       if (!userData.idBusiness) {
-        throw handleError(new Error('MS003'));
+        throw new Error('MS014');
       }
 
       // Limpiar datos sensibles pero mantener idBusiness
@@ -53,14 +53,20 @@ export class ApiKeyGuard implements CanActivate {
         password: undefined,
         apiKey: undefined,
       };
-      
+
       // Asegurar que el usuario se establezca correctamente en el request
       request['user'] = cleanUserData;
+
+      // Log para depuración
+      console.log('ApiKeyGuard - User establecido:', {
+        id: cleanUserData.id,
+        email: cleanUserData.email,
+        role: cleanUserData.role,
+        idBusiness: cleanUserData.idBusiness,
+      });
     } catch (error) {
-      if (error.message === 'MS003') {
-        throw error;
-      }
-      throw handleError(new Error('MS003'));
+      console.log('ApiKeyGuard - Error:', error);
+      throw handleError(error);
     }
 
     return true;

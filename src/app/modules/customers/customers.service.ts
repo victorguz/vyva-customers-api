@@ -19,7 +19,7 @@ export class CustomersService {
   constructor(
     @InjectModel("Customer")
     private readonly model: Model<Customer, CustomerKey>
-  ) {}
+  ) { }
 
   async findAll(user: User): Promise<GenericResponse<Customer[]>> {
     try {
@@ -107,11 +107,12 @@ export class CustomersService {
   ): Promise<GenericResponse<Customer>> {
     try {
       // Validar que el usuario exista y tenga idBusiness
+      console.log("user", user);
       if (!user) {
-        throw new Error('MS003');
+        throw new Error('MS014');
       }
       if (!user.idBusiness) {
-        throw new Error('MS003');
+        throw new Error('MS014');
       }
 
       // Verificar email duplicado solo si se proporciona email (dentro del mismo business)

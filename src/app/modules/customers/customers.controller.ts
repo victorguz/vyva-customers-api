@@ -12,23 +12,8 @@ import { CreateCustomerDto, CustomersCountResponseDto, UpdateCustomerDto } from 
 
 @ApiTags('Customers')
 @Controller('customers')
-@UseGuards(AuthGuard)
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) { }
-
-  @Post()
-  @ApiOperation({ summary: 'Create a new customer' })
-  @ApiResponse({
-    status: 201,
-    description: 'The customer has been successfully created.',
-    type: GenericResponse<Customer>,
-  })
-  async create(
-    @Body() createCustomerDto: CreateCustomerDto,
-    @CurrentUser() user: User,
-  ): Promise<GenericResponse<Customer>> {
-    return this.customersService.create(createCustomerDto, user);
-  }
 
   @Post('api-key/create')
   @UseGuards(ApiKeyGuard)
@@ -45,7 +30,23 @@ export class CustomersController {
     return this.customersService.create(createCustomerDto, user);
   }
 
+  @Post()
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Create a new customer' })
+  @ApiResponse({
+    status: 201,
+    description: 'The customer has been successfully created.',
+    type: GenericResponse<Customer>,
+  })
+  async create(
+    @Body() createCustomerDto: CreateCustomerDto,
+    @CurrentUser() user: User,
+  ): Promise<GenericResponse<Customer>> {
+    return this.customersService.create(createCustomerDto, user);
+  }
+
   @Get()
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Get all customers' })
   @ApiResponse({
     status: 200,
@@ -59,6 +60,7 @@ export class CustomersController {
   }
 
   @Get('count')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Get customers count statistics' })
   @ApiResponse({
     status: 200,
@@ -72,6 +74,7 @@ export class CustomersController {
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Get a customer by id' })
   @ApiResponse({
     status: 200,
@@ -87,6 +90,7 @@ export class CustomersController {
 
 
   @Patch(':id')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Update a customer' })
   @ApiResponse({
     status: 200,
@@ -102,6 +106,7 @@ export class CustomersController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Delete a customer' })
   @ApiResponse({
     status: 200,
