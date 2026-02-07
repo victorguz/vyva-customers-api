@@ -22,7 +22,10 @@ export interface Customer extends CustomerKey {
   profilePicture?: string;
   userId?: string;
   businessId: string;
-  data?: any;
+  data?: {
+    labels?: string[]
+    , [key: string]: any
+  };
   createdAt: Date;
   updatedAt: Date;
 }

@@ -73,6 +73,12 @@ export function handleError(
       ? error
       : (error as any)?.code || (error as any)?.error || "Unknown error";
 
+  // Extraer el stacktrace y convertirlo en array
+  const stackTraceString = (error as any)?.stack || new Error().stack || "No stack trace available";
+  const stackTraceArray = typeof stackTraceString === 'string'
+    ? stackTraceString.split('\n').filter(line => line.trim() !== '')
+    : [String(stackTraceString)];
+
   // Intentar serializar el error original de forma segura
   let originalError: any;
   try {
@@ -89,26 +95,19 @@ export function handleError(
     originalError,
     type: errorType,
     message: errorMessage,
-    stack: (error as any)?.stack,
     handledError,
     finalCode: code,
     finalStatus: status,
+    environment: isProduction ? 'production' : 'development',
   };
 
-  // Siempre loguear el error completo en console para CloudWatch
-  console.error("[handleError] Error:", JSON.stringify(errorDetails, null, 2));
-
-  if (!isProduction) {
-    console.error(
-      `[handleError] Error: ${errorMessage}`,
-      (error as any)?.stack
-    );
-  } else {
-    console.error(
-      `[handleError] Error en producción - Tipo: ${errorType}`,
-      error
-    );
-  }
+  // Unificar todo en un solo log - usar console.error con múltiples argumentos para mostrar el array correctamente
+  console.error(
+    `[handleError] ${isProduction ? 'Error en producción' : 'Error'}: ${errorType} - ${errorMessage}`,
+    errorDetails,
+    '[handleError] Stacktrace:',
+    stackTraceArray
+  );
 
   // Si el error no fue manejado, siempre usar MS027
   if (!handledError) {

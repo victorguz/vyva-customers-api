@@ -117,6 +117,10 @@ export class CustomersService {
 
       // Verificar email duplicado solo si se proporciona email (dentro del mismo business)
 
+      // Preserve data field before cleaning (even if labels is empty array)
+      const dataField = body.data;
+      console.log("dataField", dataField);
+
       const customerObj = deleteEmptyProperties({
         id: uuidv4(),
         firstName: body.firstName,
@@ -136,14 +140,27 @@ export class CustomersService {
         profilePicture: body.profilePicture,
         userId: body.userId,
         businessId: user.idBusiness, // Set businessId from current user
-        data: body.data,
         createdAt: moment().toISOString(),
         updatedAt: moment().toISOString(),
       });
+
+      // Always restore data field if it was present in the original body (even if empty or with empty labels)
+      if (dataField !== undefined) {
+        // Ensure data is properly structured as a plain object (not a Dynamoose model instance)
+        if (typeof dataField === 'object') {
+          // Deep clone to ensure it's a plain object
+          customerObj.data = JSON.parse(JSON.stringify(dataField));
+        } else {
+          customerObj.data = dataField;
+        }
+      }
+      console.log("customerObj before create", customerObj);
+      console.log("customerObj.data", customerObj.data);
       // Si no hay duplicados, crear el customer
       const newCustomer = await this.model.create(customerObj);
-
+      console.log("newCustomer.toJSON()", newCustomer.toJSON());
       const customerData = newCustomer.toJSON() as Customer;
+      console.log("customerData.data after create", customerData.data);
       return new GenericResponse(customerData);
     } catch (error) {
       throw handleError(error);
@@ -175,6 +192,10 @@ export class CustomersService {
       // Remove businessId from update data to prevent changing it
       const { businessId: _, ...updateData } = updateCustomerDto;
 
+      // Preserve data field before cleaning (even if labels is empty array)
+      const dataField = updateData.data;
+      console.log("dataField", dataField);
+
       // Clean up empty strings for indexed fields to prevent DynamoDB validation errors
       const cleanedUpdateData = { ...updateData };
 
@@ -190,12 +211,31 @@ export class CustomersService {
       // Use deleteEmptyProperties to clean up other empty values
       const finalUpdateData = deleteEmptyProperties(cleanedUpdateData);
 
-      await this.model.update({ id }, finalUpdateData);
+      // Always restore data field if it was present in the original update (even if empty or with empty labels)
+      if (dataField !== undefined) {
+        finalUpdateData.data = dataField;
+      }
+      console.log("finalUpdateData", finalUpdateData);
+      console.log("finalUpdateData.data", finalUpdateData.data);
+      console.log("typeof finalUpdateData.data", typeof finalUpdateData.data);
+      console.log("JSON.stringify(finalUpdateData.data)", JSON.stringify(finalUpdateData.data));
+
+      // Ensure data is properly structured as a plain object (not a Dynamoose model instance)
+      if (dataField !== undefined && typeof dataField === 'object') {
+        // Deep clone to ensure it's a plain object
+        finalUpdateData.data = JSON.parse(JSON.stringify(dataField));
+      }
+
+      // Update the customer - Dynamoose should handle the nested object correctly
+      const updateResult = await this.model.update({ id }, finalUpdateData);
+      console.log("updateResult.toJSON()", updateResult.toJSON());
       const updatedCustomer = await this.model.get({ id });
       if (!updatedCustomer) {
         throw new Error("MS007");
       }
       const customerData = updatedCustomer.toJSON() as Customer;
+      console.log("customerData after get", customerData);
+      console.log("customerData.data", customerData.data);
       return new GenericResponse(customerData);
     } catch (error) {
       throw handleError(error);

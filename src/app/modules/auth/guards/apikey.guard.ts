@@ -10,7 +10,8 @@ export class ApiKeyGuard implements CanActivate {
   constructor(
     @InjectModel('User')
     private readonly model: Model<User, UserKey>,
-  ) { }
+  ) {
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -19,7 +20,6 @@ export class ApiKeyGuard implements CanActivate {
     if (!apiKey) {
       throw new Error('MS014');
     }
-
     try {
       // Buscar directamente el usuario con ese apiKey exactamente como se recibe del frontend
       const users = await this.model
@@ -29,6 +29,7 @@ export class ApiKeyGuard implements CanActivate {
         .where('status')
         .eq(true)
         .exec();
+
 
       if (!users || users.length === 0) {
         throw new Error('MS007');
@@ -56,16 +57,7 @@ export class ApiKeyGuard implements CanActivate {
 
       // Asegurar que el usuario se establezca correctamente en el request
       request['user'] = cleanUserData;
-
-      // Log para depuración
-      console.log('ApiKeyGuard - User establecido:', {
-        id: cleanUserData.id,
-        email: cleanUserData.email,
-        role: cleanUserData.role,
-        idBusiness: cleanUserData.idBusiness,
-      });
     } catch (error) {
-      console.log('ApiKeyGuard - Error:', error);
       throw handleError(error);
     }
 
