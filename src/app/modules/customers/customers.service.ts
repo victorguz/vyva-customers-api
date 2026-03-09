@@ -24,8 +24,8 @@ export class CustomersService {
   async findAll(user: User): Promise<GenericResponse<Customer[]>> {
     try {
       const customers = await this.model
-        .scan()
-        .where("businessId")
+        .query('businessId')
+        .using('customer-businessid-index')
         .eq(user.idBusiness)
         .exec();
 
@@ -62,11 +62,12 @@ export class CustomersService {
   ): Promise<GenericResponse<Customer>> {
     try {
       const customers = await this.model
-        .scan()
-        .where("email")
-        .eq(email.toLowerCase())
-        .where("businessId")
+        .query('businessId')
+        .using('customer-businessid-index')
         .eq(user.idBusiness)
+        .and()
+        .where('email')
+        .eq(email.toLowerCase())
         .exec();
 
       if (!customers || customers.length === 0) {
@@ -86,11 +87,12 @@ export class CustomersService {
   ): Promise<GenericResponse<Customer[]>> {
     try {
       const customers = await this.model
-        .scan()
-        .where("userId")
-        .eq(userId)
-        .where("businessId")
+        .query('businessId')
+        .using('customer-businessid-index')
         .eq(user.idBusiness)
+        .and()
+        .where('userId')
+        .eq(userId)
         .exec();
 
       return new GenericResponse(
@@ -266,29 +268,32 @@ export class CustomersService {
     user: User
   ): Promise<GenericResponse<CustomersCountResponseDto>> {
     try {
+
+      // Calcular fechas para el filtro del mes
+      const startOfMonth = moment().startOf("month").startOf("day");
+      const endOfMonth = moment().endOf("month").endOf("day");
+
       // Obtener todos los clientes del negocio
-      const allCustomers = await this.model
-        .scan()
-        .attributes(["businessId", "createdAt"])
-        .where("businessId")
+      const monthCustomers = await this.model
+        .query('businessId')
+        .using('customer-businessid-index')
         .eq(user.idBusiness)
+        .and()
+        .where('createdAt')
+        .between(startOfMonth.toDate().getTime(), endOfMonth.toDate().getTime())
+        .count()
         .exec();
 
-      // Calcular fechas para el filtro de hoy
-      const today = moment().startOf("day");
-      const endOfDay = moment().endOf("day");
-
-      // Filtrar clientes registrados hoy - usar consulta directa si las fechas son strings
-      const todayISO = today.toISOString();
-
-      const customersRegisteredToday = allCustomers.filter((customer) => {
-        const customerDate = moment(customer.createdAt);
-        return customerDate.isBetween(today, endOfDay, null, "[]");
-      });
+      const allCustomers = await this.model
+        .query('businessId')
+        .using('customer-businessid-index')
+        .eq(user.idBusiness)
+        .count()
+        .exec();
 
       const response: CustomersCountResponseDto = {
-        totalCustomers: allCustomers.length,
-        customersRegisteredToday: customersRegisteredToday.length,
+        totalCustomers: allCustomers.count ?? 0,
+        customersRegisteredToday: monthCustomers.count ?? 0,
       };
 
       return new GenericResponse(response);

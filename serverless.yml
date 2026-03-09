@@ -20,7 +20,7 @@ provider:
     # Parámetros necesarios para autenticación (customers necesita JWT)
     JWT_SECRET: ${ssm:/vyva/${self:provider.stage}/VYVA_JWT_SECRET}
     SECRET_KEY: ${ssm:/vyva/${self:provider.stage}/VYVA_SECRET_KEY}
-
+    VYVA_SUPERADMIN_APIKEY: ${ssm:/vyva/${self:provider.stage}/VYVA_SUPERADMIN_APIKEY, ''}
   iam:
     role:
       statements:
@@ -49,7 +49,8 @@ provider:
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-customers/*
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-users
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-users/*
-
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-businesses
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-businesses/*
         # Permisos para crear y modificar tablas DynamoDB
         - Effect: Allow
           Action:
@@ -64,7 +65,8 @@ provider:
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-customers/*
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-users
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-users/*
-
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-businesses
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-businesses/*
         # Permisos para logs de CloudWatch
         - Effect: Allow
           Action:

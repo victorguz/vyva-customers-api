@@ -8,7 +8,7 @@ import { JWT_EXPIRATION } from 'src/app/core/config/environment.config';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { UserSchema } from 'src/app/schemas/user.schema';
 import { CustomerSchema } from 'src/app/schemas/customer.schema';
-import { ApiKeyGuard } from '../auth/guards/apikey.guard';
+import { BusinessSchema } from 'src/app/schemas/business.schema';
 import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Module({
@@ -45,9 +45,18 @@ import { AuthGuard } from '../auth/guards/auth.guard';
           },
         },
       },
+      {
+        name: 'Business',
+        schema: BusinessSchema,
+        options: {
+          tableName: 'businesses',
+          throughput: 'ON_DEMAND',
+          create: false,
+        },
+      },
     ]),],
   controllers: [CustomersController],
-  providers: [AuthGuard, ApiKeyGuard, JwtModule, DynamooseModule, CustomersService],
+  providers: [AuthGuard, JwtModule, DynamooseModule, CustomersService],
   exports: [CustomersService],
 })
 export class CustomersModule { }

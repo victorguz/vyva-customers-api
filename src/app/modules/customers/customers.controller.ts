@@ -6,7 +6,6 @@ import { GenericResponse } from '../../core/interfaces/generic-response.interfac
 import { Customer } from '../../schemas/customer.schema';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { ApiKeyGuard } from '../auth/guards/apikey.guard';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto, CustomersCountResponseDto, UpdateCustomerDto } from './dto/customers.dto';
 
@@ -16,7 +15,7 @@ export class CustomersController {
   constructor(private readonly customersService: CustomersService) { }
 
   @Post('api-key/create')
-  @UseGuards(ApiKeyGuard)
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Create a new customer using API key authentication' })
   @ApiResponse({
     status: 201,

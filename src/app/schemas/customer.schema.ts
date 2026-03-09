@@ -121,6 +121,13 @@ export const CustomerSchema = new Schema(
     data: {
       type: Object,
       required: false,
+      schema: {
+        labels: {
+          type: Array,
+          schema: [String],
+          required: false,
+        },
+      },
     },
   },
   {
