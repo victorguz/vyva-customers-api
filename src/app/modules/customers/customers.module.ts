@@ -41,7 +41,16 @@ import { AuthGuard } from '../auth/guards/auth.guard';
         },
         serializers: {
           frontend: {
-            include: ['id', 'firstName', 'lastName', 'email', 'phone', 'createdAt', 'data'],
+            include: [
+              'id',
+              'firstName',
+              'lastName',
+              'email',
+              'phone',
+              'status',
+              'createdAt',
+              'data',
+            ],
           },
         },
       },

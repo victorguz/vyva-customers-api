@@ -165,20 +165,20 @@ export class CreateCustomerDto {
     example: 'b9c0e5c0-5c9b-11eb-ae93-0242ac130002',
     required: false,
   })
-  @ValidateIf((o) => o.userId !== '')
+  @ValidateIf((o) => o.idUser !== '')
   @IsString()
   @IsOptional()
-  userId?: string;
+  idUser?: string;
 
   @ApiProperty({
     description: 'Business ID (automatically set to current user)',
     example: 'b9c0e5c0-5c9b-11eb-ae93-0242ac130002',
     required: false,
   })
-  @ValidateIf((o) => o.businessId !== '')
+  @ValidateIf((o) => o.idBusiness !== '')
   @IsString()
   @IsOptional()
-  businessId?: string;
+  idBusiness?: string;
 
   @ApiProperty({
     description: 'Additional data',
@@ -333,10 +333,10 @@ export class UpdateCustomerDto {
     example: 'b9c0e5c0-5c9b-11eb-ae93-0242ac130002',
     required: false,
   })
-  @ValidateIf((o) => o.userId !== '')
+  @ValidateIf((o) => o.idUser !== '')
   @IsString()
   @IsOptional()
-  userId?: string;
+  idUser?: string;
 
   @ApiProperty({
     description: 'Profile picture URL of the customer',
@@ -353,10 +353,10 @@ export class UpdateCustomerDto {
     example: 'b9c0e5c0-5c9b-11eb-ae93-0242ac130002',
     required: false,
   })
-  @ValidateIf((o) => o.businessId !== '')
+  @ValidateIf((o) => o.idBusiness !== '')
   @IsString()
   @IsOptional()
-  businessId?: string;
+  idBusiness?: string;
 
   @ApiProperty({
     description: 'Additional data',
@@ -400,7 +400,7 @@ export class CustomerResponseDto implements Customer {
   city?: string;
   address?: string;
   profilePicture?: string;
-  userId?: string;
+  idUser?: string;
   businessId: string;
   data?: any;
   createdAt: Date;
@@ -413,4 +413,15 @@ export class CustomersCountResponseDto {
 
   @ApiProperty({ description: 'Number of customers registered today' })
   customersRegisteredToday: number;
+}
+
+/** Body for find-or-create: authenticated user (from token) becomes/updates customer for the given business. Receives only idBusiness. */
+export class FindOrCreateForBookingDto {
+  @ApiProperty({
+    description: 'Business ID to associate the customer with (business the user is trying to book)',
+    example: 'b9c0e5c0-5c9b-11eb-ae93-0242ac130002',
+  })
+  @IsString()
+  @IsNotEmpty()
+  idBusiness: string;
 }

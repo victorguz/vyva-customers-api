@@ -7,7 +7,7 @@ import { Customer } from '../../schemas/customer.schema';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { CustomersService } from './customers.service';
-import { CreateCustomerDto, CustomersCountResponseDto, UpdateCustomerDto } from './dto/customers.dto';
+import { CreateCustomerDto, CustomersCountResponseDto, FindOrCreateForBookingDto, UpdateCustomerDto } from './dto/customers.dto';
 
 @ApiTags('Customers')
 @Controller('customers')
@@ -27,6 +27,23 @@ export class CustomersController {
     @CurrentUser() user: User,
   ): Promise<GenericResponse<Customer>> {
     return this.customersService.create(createCustomerDto, user);
+  }
+
+  @Post('find-or-create')
+  @UseGuards(AuthGuard)
+  @ApiOperation({
+    summary: 'Find or create customer for the current user in a business (booking flow)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Uses the authenticated user (token). Receives only idBusiness. Returns the existing customer or creates one when no customer exists with the same idUser for that business. Updates customer data from current user on each call.',
+    type: GenericResponse<Customer>,
+  })
+  async findOrCreateForBooking(
+    @Body() body: FindOrCreateForBookingDto,
+    @CurrentUser() user: User,
+  ): Promise<GenericResponse<Customer>> {
+    return this.customersService.findOrCreateForBooking(user, body);
   }
 
   @Post()

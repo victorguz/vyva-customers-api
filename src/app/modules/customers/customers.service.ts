@@ -11,6 +11,7 @@ import { handleError } from "../../shared/error.functions";
 import {
   CreateCustomerDto,
   CustomersCountResponseDto,
+  FindOrCreateForBookingDto,
   UpdateCustomerDto,
 } from "./dto/customers.dto";
 
@@ -81,8 +82,8 @@ export class CustomersService {
     }
   }
 
-  async findByUserId(
-    userId: string,
+  async findByIdUser(
+    idUser: string,
     user: User
   ): Promise<GenericResponse<Customer[]>> {
     try {
@@ -91,13 +92,87 @@ export class CustomersService {
         .using('customer-businessid-index')
         .eq(user.idBusiness)
         .and()
-        .where('userId')
-        .eq(userId)
+        .where('idUser')
+        .eq(idUser)
         .exec();
 
       return new GenericResponse(
         customers.map((customer) => customer.toJSON() as Customer)
       );
+    } catch (error) {
+      throw handleError(error);
+    }
+  }
+
+  /**
+   * Find customer by idUser and idBusiness (for booking flow).
+   * Used when the caller is the end-user; idUser comes from @CurrentUser(), idBusiness from body.
+   */
+  async findByIdUserAndIdBusiness(
+    idUser: string,
+    idBusiness: string
+  ): Promise<Customer | null> {
+    try {
+      const customers = await this.model
+        .query('businessId')
+        .using('customer-businessid-index')
+        .eq(idBusiness)
+        .and()
+        .where('idUser')
+        .eq(idUser)
+        .exec();
+
+      if (!customers || customers.length === 0) return null;
+      return customers[0].toJSON() as Customer;
+    } catch (error) {
+      throw handleError(error);
+    }
+  }
+
+  /**
+   * Find or create customer for the authenticated user in the given business.
+   * User comes from token (@CurrentUser); body only receives idBusiness.
+   * If a customer with the same idUser already exists for that business, returns it and updates its data from the current user.
+   * Otherwise creates a new customer linked to the user.
+   */
+  async findOrCreateForBooking(
+    user: User,
+    body: FindOrCreateForBookingDto
+  ): Promise<GenericResponse<Customer>> {
+    try {
+      const idBusiness = body.idBusiness;
+      if (!idBusiness) {
+        throw new Error('MS014'); // idBusiness required
+      }
+
+      const existing = await this.findByIdUserAndIdBusiness(user.id, idBusiness);
+
+      if (existing) {
+        // Update customer info on each booking from current user
+        const nameParts = (user.name || '').trim().split(/\s+/);
+        const updatePayload: UpdateCustomerDto = {
+          firstName: nameParts[0] || existing.firstName,
+          lastName: nameParts.slice(1).join(' ') || existing.lastName || undefined,
+          email: user.email ?? existing.email,
+          phone: user.phone ?? existing.phone,
+          profilePicture: user.profilePicture ?? existing.profilePicture,
+        };
+        return this.update(existing.id, updatePayload, { ...user, idBusiness } as User);
+      }
+
+      // Create new customer from current user
+      const nameParts = (user.name || '').trim().split(/\s+/);
+      const createPayload: CreateCustomerDto = {
+        firstName: nameParts[0] || 'Cliente',
+        lastName: nameParts.slice(1).join(' ') || undefined,
+        email: user.email,
+        phone: user.phone,
+        profilePicture: user.profilePicture,
+        idUser: user.id,
+      };
+
+      const userWithBusiness = { ...user, idBusiness } as User;
+      return this.create(createPayload, userWithBusiness);
     } catch (error) {
       throw handleError(error);
     }
@@ -140,8 +215,8 @@ export class CustomersService {
         city: body.city,
         address: body.address,
         profilePicture: body.profilePicture,
-        userId: body.userId,
-        businessId: user.idBusiness, // Set businessId from current user
+        idUser: body.idUser,
+        businessId: user.idBusiness,
         createdAt: moment().toISOString(),
         updatedAt: moment().toISOString(),
       });
@@ -191,8 +266,8 @@ export class CustomersService {
         updateCustomerDto.email = updateCustomerDto.email.toLowerCase();
       }
 
-      // Remove businessId from update data to prevent changing it
-      const { businessId: _, ...updateData } = updateCustomerDto;
+      // Remove idBusiness from update data to prevent changing it
+      const { idBusiness: _, ...updateData } = updateCustomerDto;
 
       // Preserve data field before cleaning (even if labels is empty array)
       const dataField = updateData.data;
@@ -268,6 +343,8 @@ export class CustomersService {
     user: User
   ): Promise<GenericResponse<CustomersCountResponseDto>> {
     try {
+      // Customer rows use attribute businessId + GSI customer-businessid-index (not idBusiness)
+      const businessId = user.idBusiness;
 
       // Calcular fechas para el filtro del mes
       const startOfMonth = moment().startOf("month").startOf("day");
@@ -277,7 +354,7 @@ export class CustomersService {
       const monthCustomers = await this.model
         .query('businessId')
         .using('customer-businessid-index')
-        .eq(user.idBusiness)
+        .eq(businessId)
         .and()
         .where('createdAt')
         .between(startOfMonth.toDate().getTime(), endOfMonth.toDate().getTime())
@@ -287,7 +364,7 @@ export class CustomersService {
       const allCustomers = await this.model
         .query('businessId')
         .using('customer-businessid-index')
-        .eq(user.idBusiness)
+        .eq(businessId)
         .count()
         .exec();
 

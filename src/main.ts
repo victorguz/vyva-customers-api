@@ -26,7 +26,12 @@ const cors = {
 function getOrigin() {
   switch (process.env.NODE_ENV) {
     case "prd":
-      return ["https://app.vyvapos.com","https://mundofitcol.com"];
+      return [
+        "https://app.vyvapos.com",
+        "https://mundofitcol.com",
+        "http://mundofitcol.com",
+        
+      ];
     case "dev":
     case "qas":
     default:
