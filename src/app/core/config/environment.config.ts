@@ -1,5 +1,5 @@
-import { ConfigModuleOptions } from '@nestjs/config';
-import { plainToInstance } from 'class-transformer';
+import { ConfigModuleOptions } from "@nestjs/config";
+import { plainToInstance } from "class-transformer";
 import {
   IsBoolean,
   IsEnum,
@@ -7,17 +7,17 @@ import {
   IsOptional,
   IsString,
   validateSync,
-} from 'class-validator';
-import * as Joi from 'joi';
+} from "class-validator";
+import * as Joi from "joi";
 
 export enum Environment {
-  Development = 'dev',
-  Production = 'prd',
-  Quality = 'qas',
+  Development = "dev",
+  Production = "prd",
+  Quality = "qas",
 }
 
 export const JWT_EXPIRATION =
-  process.env.NODE_ENV == Environment.Development ? '7d' : '24h';
+  process.env.NODE_ENV == Environment.Development ? "7d" : "24h";
 
 export const isProduction: boolean =
   process.env.NODE_ENV == Environment.Production;
@@ -35,8 +35,8 @@ export class EnvironmentVariables {
   ERROR_LOGS: boolean = false;
 
   @IsString()
-  VYVA_SUPERADMIN_APIKEY: string;
-  
+  VYVAPOS_ID_BUSINESS: string;
+
   @IsString()
   JWT_SECRET: string;
 
@@ -54,14 +54,12 @@ export class EnvironmentVariables {
 }
 
 const validationSchema = Joi.object({
-  NODE_ENV: Joi.string()
-    .valid('dev', 'qas', 'prd')
-    .default('dev'),
+  NODE_ENV: Joi.string().valid("dev", "qas", "prd").default("dev"),
   PORT: Joi.number().default(3000),
   ERROR_LOGS: Joi.boolean().default(false),
   JWT_SECRET: Joi.string().required(),
   SECRET_KEY: Joi.string().required(),
-  VYVA_SUPERADMIN_APIKEY: Joi.string().required(),
+  VYVAPOS_ID_BUSINESS: Joi.string().required(),
   ACCESS_KEY_ID: Joi.string().optional(),
   SECRET_ACCESS_KEY: Joi.string().optional(),
   REGION: Joi.string().optional(),

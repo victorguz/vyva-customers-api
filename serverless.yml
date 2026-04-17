@@ -20,7 +20,7 @@ provider:
     # Parámetros necesarios para autenticación (customers necesita JWT)
     JWT_SECRET: ${ssm:/vyva/${self:provider.stage}/VYVA_JWT_SECRET}
     SECRET_KEY: ${ssm:/vyva/${self:provider.stage}/VYVA_SECRET_KEY}
-    VYVA_SUPERADMIN_APIKEY: ${ssm:/vyva/${self:provider.stage}/VYVA_SUPERADMIN_APIKEY, ''}
+    VYVAPOS_ID_BUSINESS: ${ssm:/vyva/${self:provider.stage}/VYVAPOS_ID_BUSINESS, ''}
   iam:
     role:
       statements:
@@ -90,7 +90,7 @@ functions:
             headers:
               - Content-Type
               - Authorization
-            allowCredentials: true
+            allowCredentials: false
       - http:
           path: /api/customers/{proxy+}
           method: ANY
@@ -99,7 +99,7 @@ functions:
             headers:
               - Content-Type
               - Authorization
-            allowCredentials: true
+            allowCredentials: false
 
 # resources:
 #   Resources:
@@ -118,5 +118,5 @@ functions:
 package:
   excludeDevDependencies: true
   patterns:
-    - '!**'
-    - 'dist/**'
+    - "!**"
+    - "dist/**"

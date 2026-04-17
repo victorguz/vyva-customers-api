@@ -20,7 +20,7 @@ const cors = {
   origin: getOrigin(),
   methods: "POST,OPTIONS,GET,PUT,PATCH,DELETE",
   allowedHeaders:
-    "Content-Type, Accept, Authorization, X-Requested-With, Application, Origin, Access-Control-Allow-Origin, Access-Control-Allow-Credentials",
+    "Content-Type, Accept, Authorization, X-Requested-With, Application, Origin, Access-Control-Allow-Origin, Access-Control-Allow-Credentials, x-api-bid, x-api-key, api-key",
 };
 
 function getOrigin() {
@@ -30,7 +30,7 @@ function getOrigin() {
         "https://app.vyvapos.com",
         "https://mundofitcol.com",
         "http://mundofitcol.com",
-        
+
       ];
     case "dev":
     case "qas":
@@ -47,13 +47,13 @@ async function bootstrap(
   const app =
     expressApp == undefined
       ? await NestFactory.create<NestExpressApplication>(AppModule, {
-          logger: ["log", "debug", "error", "verbose", "warn"],
-          bufferLogs: true,
-        })
+        logger: ["log", "debug", "error", "verbose", "warn"],
+        bufferLogs: true,
+      })
       : await NestFactory.create<NestExpressApplication>(
-          AppModule,
-          new ExpressAdapter(expressApp)
-        );
+        AppModule,
+        new ExpressAdapter(expressApp)
+      );
 
   app.setGlobalPrefix("api");
   app.use(json({ limit: "10mb" }));
