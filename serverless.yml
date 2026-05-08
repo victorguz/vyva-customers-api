@@ -51,6 +51,8 @@ provider:
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-users/*
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-businesses
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-businesses/*
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-appointments
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-vyva-appointments/*
         # Permisos para crear y modificar tablas DynamoDB
         - Effect: Allow
           Action:
@@ -81,39 +83,6 @@ functions:
     handler: dist/lambda.handler
     layers:
       - arn:aws:lambda:us-east-1:754881596744:layer:vyva-auth:1
-    events:
-      - http:
-          path: /api/customers
-          method: ANY
-          cors:
-            origin: "*"
-            headers:
-              - Content-Type
-              - Authorization
-            allowCredentials: false
-      - http:
-          path: /api/customers/{proxy+}
-          method: ANY
-          cors:
-            origin: "*"
-            headers:
-              - Content-Type
-              - Authorization
-            allowCredentials: false
-
-# resources:
-#   Resources:
-#     CustomersTable:
-#       Type: AWS::DynamoDB::Table
-#       Properties:
-#         TableName: ${self:provider.stage}-vyva-customers
-#         BillingMode: PAY_PER_REQUEST
-#         AttributeDefinitions:
-#           - AttributeName: id
-#             AttributeType: S
-#         KeySchema:
-#           - AttributeName: id
-#             KeyType: HASH
 
 package:
   excludeDevDependencies: true
