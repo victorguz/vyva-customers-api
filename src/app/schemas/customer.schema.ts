@@ -23,8 +23,9 @@ export interface Customer extends CustomerKey {
   idUser?: string;
   businessId: string;
   data?: {
-    labels?: string[]
-    , [key: string]: any
+    labels?: string[];
+    crm?: string;
+    [key: string]: any;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -127,10 +128,14 @@ export const CustomerSchema = new Schema(
           schema: [String],
           required: false,
         },
+        crm: {
+          type: String,
+          required: false,
+        },
       },
     },
   },
   {
     timestamps: true,
-  }
+  },
 );

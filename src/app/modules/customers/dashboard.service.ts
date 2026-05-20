@@ -732,8 +732,9 @@ export class DashboardService {
     includeCustomers: boolean,
     range: DateRange,
   ): DashboardMetricDto {
-    const reference = range.end ? moment(range.end) : moment();
-    const threshold = reference.clone().subtract(6, "months").valueOf();
+    const threshold = range.start
+      ? range.start
+      : moment().subtract(6, "months").valueOf();
     const lostIds: string[] = [];
 
     customerAppointmentsAll.forEach((appointments, customerId) => {
