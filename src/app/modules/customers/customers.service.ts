@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import { GenericResponse } from "../../core/interfaces/generic-response.interface";
 import { Customer, CustomerKey } from "../../schemas/customer.schema";
-import { handleError } from "../../shared/error.functions";
 import {
   CreateCustomerDto,
   CustomersCountResponseDto,
@@ -34,7 +33,7 @@ export class CustomersService {
         customers.map((customer) => customer.serialize("frontend") as Customer)
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -53,7 +52,7 @@ export class CustomersService {
 
       return new GenericResponse(customerData);
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -78,7 +77,7 @@ export class CustomersService {
       const customerData = customers[0].toJSON() as Customer;
       return new GenericResponse(customerData);
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -100,7 +99,7 @@ export class CustomersService {
         customers.map((customer) => customer.toJSON() as Customer)
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -125,7 +124,7 @@ export class CustomersService {
       if (!customers || customers.length === 0) return null;
       return customers[0].toJSON() as Customer;
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -174,7 +173,7 @@ export class CustomersService {
       const userWithBusiness = { ...user, idBusiness } as User;
       return this.create(createPayload, userWithBusiness);
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -231,16 +230,12 @@ export class CustomersService {
           customerObj.data = dataField;
         }
       }
-      console.log("customerObj before create", customerObj);
-      console.log("customerObj.data", customerObj.data);
       // Si no hay duplicados, crear el customer
       const newCustomer = await this.model.create(customerObj);
-      console.log("newCustomer.toJSON()", newCustomer.toJSON());
       const customerData = newCustomer.toJSON() as Customer;
-      console.log("customerData.data after create", customerData.data);
       return new GenericResponse(customerData);
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -271,7 +266,6 @@ export class CustomersService {
 
       // Preserve data field before cleaning (even if labels is empty array)
       const dataField = updateData.data;
-      console.log("dataField", dataField);
 
       // Clean up empty strings for indexed fields to prevent DynamoDB validation errors
       const cleanedUpdateData = { ...updateData };
@@ -292,10 +286,6 @@ export class CustomersService {
       if (dataField !== undefined) {
         finalUpdateData.data = dataField;
       }
-      console.log("finalUpdateData", finalUpdateData);
-      console.log("finalUpdateData.data", finalUpdateData.data);
-      console.log("typeof finalUpdateData.data", typeof finalUpdateData.data);
-      console.log("JSON.stringify(finalUpdateData.data)", JSON.stringify(finalUpdateData.data));
 
       // Ensure data is properly structured as a plain object (not a Dynamoose model instance)
       if (dataField !== undefined && typeof dataField === 'object') {
@@ -305,17 +295,14 @@ export class CustomersService {
 
       // Update the customer - Dynamoose should handle the nested object correctly
       const updateResult = await this.model.update({ id }, finalUpdateData);
-      console.log("updateResult.toJSON()", updateResult.toJSON());
       const updatedCustomer = await this.model.get({ id });
       if (!updatedCustomer) {
         throw new Error("MS007");
       }
       const customerData = updatedCustomer.toJSON() as Customer;
-      console.log("customerData after get", customerData);
-      console.log("customerData.data", customerData.data);
       return new GenericResponse(customerData);
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -335,7 +322,7 @@ export class CustomersService {
       await this.model.update({ id }, { status: false });
       return new GenericResponse(undefined);
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -375,7 +362,7 @@ export class CustomersService {
 
       return new GenericResponse(response);
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 }

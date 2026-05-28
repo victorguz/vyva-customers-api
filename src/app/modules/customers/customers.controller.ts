@@ -3,19 +3,28 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Param,
   Patch,
   Post,
+  Res,
   UseGuards,
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Response } from "express";
 import { User } from "src/app/schemas/user.schema";
 
 import { GenericResponse } from "../../core/interfaces/generic-response.interface";
 import { Customer } from "../../schemas/customer.schema";
 import { CurrentUser } from "../../core/auth/decorators/current-user.decorator";
 import { AuthGuard } from "../../core/auth/guards/auth.guard";
+import { CustomersExportService } from "./customers-export.service";
+import { CustomersImportService } from "./customers-import.service";
 import { CustomersService } from "./customers.service";
+import {
+  CustomersImportResultDto,
+  ImportCustomersCsvDto,
+} from "./dto/customers-csv.dto";
 import {
   CreateCustomerDto,
   CustomersCountResponseDto,
@@ -26,7 +35,11 @@ import {
 @ApiTags("Customers")
 @Controller("customers")
 export class CustomersController {
-  constructor(private readonly customersService: CustomersService) {}
+  constructor(
+    private readonly customersService: CustomersService,
+    private readonly customersExportService: CustomersExportService,
+    private readonly customersImportService: CustomersImportService,
+  ) {}
 
   @Post("api-key/create")
   @UseGuards(AuthGuard)
@@ -105,6 +118,35 @@ export class CustomersController {
     @CurrentUser() user: User,
   ): Promise<GenericResponse<CustomersCountResponseDto>> {
     return this.customersService.getCustomersCount(user);
+  }
+
+  @Get("export/csv")
+  @UseGuards(AuthGuard)
+  @Header("Content-Type", "text/csv; charset=utf-8")
+  @Header("Content-Disposition", 'attachment; filename="clientes.csv"')
+  @ApiOperation({ summary: "Export customers as CSV" })
+  @ApiResponse({
+    status: 200,
+    description: "CSV file with all customers of the business.",
+  })
+  async exportCsv(@CurrentUser() user: User, @Res() res: Response): Promise<void> {
+    const csv = await this.customersExportService.exportToCsv(user);
+    res.send(csv);
+  }
+
+  @Post("import/csv")
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: "Import customers from CSV text in JSON body" })
+  @ApiResponse({
+    status: 200,
+    description: "Import result with created and failed row counts.",
+    type: GenericResponse<CustomersImportResultDto>,
+  })
+  async importCsv(
+    @Body() body: ImportCustomersCsvDto,
+    @CurrentUser() user: User,
+  ): Promise<GenericResponse<CustomersImportResultDto>> {
+    return this.customersImportService.importFromCsv(body.csv, user);
   }
 
   @Get(":id")

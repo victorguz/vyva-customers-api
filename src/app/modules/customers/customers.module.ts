@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common";
 
 import { CustomersController } from "./customers.controller";
+import { CustomersExportService } from "./customers-export.service";
+import { CustomersImportService } from "./customers-import.service";
 import { CustomersService } from "./customers.service";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
@@ -84,8 +86,15 @@ import { DashboardService } from "./dashboard.service";
     JwtModule,
     DynamooseModule,
     CustomersService,
+    CustomersExportService,
+    CustomersImportService,
     DashboardService,
   ],
-  exports: [CustomersService, DashboardService],
+  exports: [
+    CustomersService,
+    CustomersExportService,
+    CustomersImportService,
+    DashboardService,
+  ],
 })
 export class CustomersModule {}

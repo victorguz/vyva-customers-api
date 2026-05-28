@@ -6,7 +6,6 @@ import { User } from "src/app/schemas/user.schema";
 import { GenericResponse } from "../../core/interfaces/generic-response.interface";
 import { Appointment, AppointmentKey } from "../../schemas/appointment.schema";
 import { Customer, CustomerKey } from "../../schemas/customer.schema";
-import { handleError } from "../../shared/error.functions";
 import { DashboardMetricDto, DashboardQueryDto } from "./dto/dashboard.dto";
 
 type DateRange = { start?: number; end?: number };
@@ -45,7 +44,7 @@ export class DashboardService {
         ),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -64,7 +63,7 @@ export class DashboardService {
         ),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -83,7 +82,7 @@ export class DashboardService {
         ),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -97,7 +96,7 @@ export class DashboardService {
         this.buildAverageFrequencyMetric(context.customerAppointmentsInRange),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -111,7 +110,7 @@ export class DashboardService {
         this.buildNoShowMetric(context.appointmentsInRange),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -125,7 +124,7 @@ export class DashboardService {
         this.buildBookingLeadTimeMetric(context.appointmentsInRange),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -139,7 +138,7 @@ export class DashboardService {
         this.buildAverageTicketMetric(context.appointmentsInRange),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -153,7 +152,7 @@ export class DashboardService {
         this.buildLtvMetric(context.customerAppointmentsAll),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -171,7 +170,7 @@ export class DashboardService {
         ),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -190,7 +189,7 @@ export class DashboardService {
         ),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -209,7 +208,7 @@ export class DashboardService {
         ),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -228,7 +227,7 @@ export class DashboardService {
         ),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -242,7 +241,7 @@ export class DashboardService {
         this.buildProjectedIncomeMetric(context.appointments, context.range),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
@@ -256,7 +255,7 @@ export class DashboardService {
         this.buildLostIncomeMetric(context.appointments, context.range),
       );
     } catch (error) {
-      throw handleError(error);
+      throw error;
     }
   }
 
