@@ -407,14 +407,6 @@ export class CustomerResponseDto implements Customer {
   updatedAt: Date;
 }
 
-export class CustomersCountResponseDto {
-  @ApiProperty({ description: 'Total number of registered customers' })
-  totalCustomers: number;
-
-  @ApiProperty({ description: 'Number of customers registered today' })
-  customersRegisteredToday: number;
-}
-
 /** Body for find-or-create: authenticated user (from token) becomes/updates customer for the given business. Receives only idBusiness. */
 export class FindOrCreateForBookingDto {
   @ApiProperty({

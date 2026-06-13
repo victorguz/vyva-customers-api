@@ -9,7 +9,6 @@ import { GenericResponse } from "../../core/interfaces/generic-response.interfac
 import { Customer, CustomerKey } from "../../schemas/customer.schema";
 import {
   CreateCustomerDto,
-  CustomersCountResponseDto,
   FindOrCreateForBookingDto,
   UpdateCustomerDto,
 } from "./dto/customers.dto";
@@ -321,46 +320,6 @@ export class CustomersService {
 
       await this.model.update({ id }, { status: false });
       return new GenericResponse(undefined);
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async getCustomersCount(
-    user: User
-  ): Promise<GenericResponse<CustomersCountResponseDto>> {
-    try {
-      // Customer rows use attribute businessId + GSI customer-businessid-index (not idBusiness)
-      const businessId = user.idBusiness;
-
-      // Calcular fechas para el filtro del mes
-      const startOfMonth = moment().startOf("month").startOf("day");
-      const endOfMonth = moment().endOf("month").endOf("day");
-
-      // Obtener todos los clientes del negocio
-      const monthCustomers = await this.model
-        .query('businessId')
-        .using('customer-businessid-index')
-        .eq(businessId)
-        .and()
-        .where('createdAt')
-        .between(startOfMonth.toDate().getTime(), endOfMonth.toDate().getTime())
-        .count()
-        .exec();
-
-      const allCustomers = await this.model
-        .query('businessId')
-        .using('customer-businessid-index')
-        .eq(businessId)
-        .count()
-        .exec();
-
-      const response: CustomersCountResponseDto = {
-        totalCustomers: allCustomers.count ?? 0,
-        customersRegisteredToday: monthCustomers.count ?? 0,
-      };
-
-      return new GenericResponse(response);
     } catch (error) {
       throw error;
     }

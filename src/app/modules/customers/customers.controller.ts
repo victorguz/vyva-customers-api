@@ -27,7 +27,6 @@ import {
 } from "./dto/customers-csv.dto";
 import {
   CreateCustomerDto,
-  CustomersCountResponseDto,
   FindOrCreateForBookingDto,
   UpdateCustomerDto,
 } from "./dto/customers.dto";
@@ -104,20 +103,6 @@ export class CustomersController {
     @CurrentUser() user: User,
   ): Promise<GenericResponse<Customer[]>> {
     return this.customersService.findAll(user);
-  }
-
-  @Get("count")
-  @UseGuards(AuthGuard)
-  @ApiOperation({ summary: "Get customers count statistics" })
-  @ApiResponse({
-    status: 200,
-    description: "Return total customers and customers registered today count.",
-    type: GenericResponse<CustomersCountResponseDto>,
-  })
-  async getCustomersCount(
-    @CurrentUser() user: User,
-  ): Promise<GenericResponse<CustomersCountResponseDto>> {
-    return this.customersService.getCustomersCount(user);
   }
 
   @Get("export/csv")

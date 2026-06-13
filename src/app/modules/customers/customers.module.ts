@@ -11,10 +11,7 @@ import { DynamooseModule } from "nestjs-dynamoose";
 import { UserSchema } from "src/app/schemas/user.schema";
 import { CustomerSchema } from "src/app/schemas/customer.schema";
 import { BusinessSchema } from "src/app/schemas/business.schema";
-import { AppointmentSchema } from "src/app/schemas/appointment.schema";
 import { AuthGuard } from "../../core/auth/guards/auth.guard";
-import { DashboardController } from "./dashboard.controller";
-import { DashboardService } from "./dashboard.service";
 
 @Module({
   imports: [
@@ -69,18 +66,9 @@ import { DashboardService } from "./dashboard.service";
           create: false,
         },
       },
-      {
-        name: "Appointment",
-        schema: AppointmentSchema,
-        options: {
-          tableName: "appointments",
-          throughput: "ON_DEMAND",
-          create: false,
-        },
-      },
     ]),
   ],
-  controllers: [CustomersController, DashboardController],
+  controllers: [CustomersController],
   providers: [
     AuthGuard,
     JwtModule,
@@ -88,13 +76,11 @@ import { DashboardService } from "./dashboard.service";
     CustomersService,
     CustomersExportService,
     CustomersImportService,
-    DashboardService,
   ],
   exports: [
     CustomersService,
     CustomersExportService,
     CustomersImportService,
-    DashboardService,
   ],
 })
 export class CustomersModule {}
