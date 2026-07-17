@@ -4,6 +4,9 @@ frameworkVersion: "3"
 custom:
   sharedHttpApiId: ${ssm:/vyva/${self:provider.stage}/HTTP_API_ID}
   sharedAuthorizerId: ${ssm:/vyva/${self:provider.stage}/HTTP_API_AUTHORIZER_ID}
+  corsAllowedOrigins: ${ssm:/vyva/${self:provider.stage}/CORS_ALLOWED_ORIGINS}
+  corsAllowedMethods: ${ssm:/vyva/${self:provider.stage}/CORS_ALLOWED_METHODS}
+  corsAllowedHeaders: ${ssm:/vyva/${self:provider.stage}/CORS_ALLOWED_HEADERS}
 
 provider:
   name: aws
@@ -89,10 +92,10 @@ provider:
             - arn:aws:logs:${self:provider.region}:*:*
 
 functions:
-  api:
-    handler: dist/lambda.handler
-    layers:
-      - arn:aws:lambda:us-east-1:754881596744:layer:vyva-auth:1
+  preflight:
+    handler: dist/preflight.handler
+    memorySize: 128
+    timeout: 5
     events:
       - httpApi:
           path: /api/customers
@@ -100,6 +103,11 @@ functions:
       - httpApi:
           path: /api/customers/{proxy+}
           method: OPTIONS
+  api:
+    handler: dist/lambda.handler
+    layers:
+      - arn:aws:lambda:us-east-1:754881596744:layer:vyva-auth:1
+    events:
       - httpApi:
           path: /api/customers
           method: ANY
