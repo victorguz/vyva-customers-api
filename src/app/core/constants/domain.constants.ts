@@ -11,12 +11,26 @@ export enum UserGender {
 }
 export enum UserRole {
   superadmin = 'superadmin',
+  supermarketing = 'supermarketing',
   admin = 'admin',
   assistant = 'assistant',
   trainer = 'trainer',
   customer = 'customer',
   vyva = 'vyva',
 }
+
+/** Roles de plataforma que pueden operar con idBusiness del JWT/edge context. */
+export const PLATFORM_CROSS_BUSINESS_ROLES: UserRole[] = [
+  UserRole.superadmin,
+  UserRole.supermarketing,
+];
+
+export function isPlatformCrossBusinessRole(
+  role?: string | null,
+): boolean {
+  return PLATFORM_CROSS_BUSINESS_ROLES.includes(role as UserRole);
+}
+
 export enum PaymentMethodType {
   cash = 'cash',
   transfer = 'transfer',
