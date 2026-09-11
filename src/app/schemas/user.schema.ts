@@ -1,14 +1,13 @@
-import { Schema } from 'dynamoose';
+import { Schema } from "dynamoose";
 
 export interface UserKey {
   id: string;
 }
 
 export interface User extends UserKey {
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
-  password: string;
+  password?: string;
   role: string;
   status: boolean;
   documentType?: string;
@@ -23,9 +22,12 @@ export interface User extends UserKey {
   address?: string;
   googleId?: string;
   profilePicture?: string;
-  businessInfoId?: string;
+  idBusiness?: string;
+  specialty?: string;
+  profile?: string;
   data?: any;
   isVerified?: boolean;
+  apiKey?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,11 +39,15 @@ export const UserSchema = new Schema(
       hashKey: true,
       required: true,
     },
-    firstName: {
+    name: {
       type: String,
       required: true,
     },
-    lastName: {
+    specialty: {
+      type: String,
+      required: false,
+    },
+    profile: {
       type: String,
       required: false,
     },
@@ -49,8 +55,8 @@ export const UserSchema = new Schema(
       type: String,
       required: true,
       index: {
-        type: 'global',
-        name: 'email-index',
+        type: "global",
+        name: "email-index",
       },
     },
     password: {
@@ -67,12 +73,12 @@ export const UserSchema = new Schema(
     documentType: {
       type: String,
       required: false,
-      default: '',
+      default: "",
     },
     documentNumber: {
       type: String,
       required: false,
-      default: '',
+      default: "",
     },
     phone: {
       type: String,
@@ -85,7 +91,7 @@ export const UserSchema = new Schema(
     typePerson: {
       type: String,
       required: false,
-      default: 'natural',
+      default: "natural",
     },
     gender: {
       type: String,
@@ -115,12 +121,12 @@ export const UserSchema = new Schema(
       type: String,
       required: false,
     },
-    businessInfoId: {
+    idBusiness: {
       type: String,
-      required: true,
+      required: false,
       index: {
-        type: 'global',
-        name: 'businessInfo-index',
+        type: "global",
+        name: "businessInfo-index",
       },
     },
     data: {
@@ -132,8 +138,12 @@ export const UserSchema = new Schema(
       required: false,
       default: false,
     },
+    apiKey: {
+      type: String,
+      required: false,
+    },
   },
   {
     timestamps: true,
-  },
+  }
 );

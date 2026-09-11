@@ -1,4 +1,4 @@
-import { Schema } from 'dynamoose';
+import { Schema } from "dynamoose";
 
 export interface CustomerKey {
   id: string;
@@ -20,9 +20,13 @@ export interface Customer extends CustomerKey {
   city?: string;
   address?: string;
   profilePicture?: string;
-  userId?: string;
+  idUser?: string;
   businessId: string;
-  data?: any;
+  data?: {
+    labels?: string[];
+    crm?: string;
+    [key: string]: any;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,14 +50,14 @@ export const CustomerSchema = new Schema(
       type: String,
       required: false,
       index: {
-        type: 'global',
-        name: 'customer-email-index',
+        type: "global",
+        name: "customer-email-index",
       },
     },
     role: {
       type: String,
       required: false,
-      default: 'customer',
+      default: "customer",
     },
     status: {
       type: Boolean,
@@ -63,12 +67,12 @@ export const CustomerSchema = new Schema(
     documentType: {
       type: String,
       required: false,
-      default: '',
+      default: "",
     },
     documentNumber: {
       type: String,
       required: false,
-      default: '',
+      default: "",
     },
     phone: {
       type: String,
@@ -77,7 +81,7 @@ export const CustomerSchema = new Schema(
     typePerson: {
       type: String,
       required: false,
-      default: 'natural',
+      default: "natural",
     },
     gender: {
       type: String,
@@ -103,7 +107,7 @@ export const CustomerSchema = new Schema(
       type: String,
       required: false,
     },
-    userId: {
+    idUser: {
       type: String,
       required: false,
     },
@@ -111,13 +115,24 @@ export const CustomerSchema = new Schema(
       type: String,
       required: true,
       index: {
-        type: 'global',
-        name: 'customer-businessid-index',
+        type: "global",
+        name: "customer-businessid-index",
       },
     },
     data: {
       type: Object,
       required: false,
+      schema: {
+        labels: {
+          type: Array,
+          schema: [String],
+          required: false,
+        },
+        crm: {
+          type: String,
+          required: false,
+        },
+      },
     },
   },
   {
