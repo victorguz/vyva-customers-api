@@ -18,11 +18,23 @@
     "test:cov": "jest --coverage",
     "logs:qas": "serverless logs -t -f api --stage qas",
     "logs:prd": "serverless logs -t -f api --stage prd",
+    "predeploy:qas": "node scripts/release-version.mjs qas",
+
     "deploy:qas": "nest build && serverless deploy function -f api --stage qas",
+    "predeploy:prd": "node scripts/release-version.mjs prd",
+
     "deploy:prd": "nest build && serverless deploy function -f api --stage prd",
+    "predeploy:all": "node scripts/release-version.mjs all",
+
     "deploy:all": "nest build && serverless deploy function -f api --stage qas && serverless deploy function -f api --stage prd",
+    "predeploy:qas:force": "node scripts/release-version.mjs qas",
+
     "deploy:qas:force": "nest build && serverless deploy --stage qas",
+    "predeploy:prd:force": "node scripts/release-version.mjs prd",
+
     "deploy:prd:force": "nest build && serverless deploy --stage prd",
+    "predeploy:all:force": "node scripts/release-version.mjs all",
+
     "deploy:all:force": "nest build && serverless deploy --stage qas && serverless deploy --stage prd"
   },
   "dependencies": {
