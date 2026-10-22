@@ -1,6 +1,6 @@
 {
   "name": "vyva-customers",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Vyva Customers API - Serverless module for customer management",
   "author": "",
   "private": true,
